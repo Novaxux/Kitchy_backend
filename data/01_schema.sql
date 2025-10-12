@@ -38,7 +38,6 @@ CREATE TABLE recipes (
     category_id INT,
     country_id INT,
     likes_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     CONSTRAINT fk_country FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE SET NULL
 );
