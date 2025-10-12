@@ -32,14 +32,16 @@ export class RecipeRepository {
   }
   // Obtener todas las recetas
   static async getAllRecipes(pool) {
-    const [rows] = await pool.query("SELECT * FROM recipes");
+    const [rows] = await pool.query(
+      "SELECT id, title, description, image_url, likes_count FROM recipes"
+    );
     return rows;
   }
 
   // Buscar recetas por nombre (LIKE)
   static async getRecipesByName(pool, name) {
     const [rows] = await pool.query(
-      "SELECT * FROM recipes WHERE title LIKE ?",
+      "SELECT id, title, description, image_url, likes_count FROM recipes WHERE title LIKE ?",
       [`%${name}%`]
     );
     return rows;
@@ -73,7 +75,6 @@ export class RecipeRepository {
   static async getIngredientsByRecipeId(pool, recipeId) {
     const sql = `
     SELECT 
-      ri.ingredient_id,
       i.name AS ingredient_name,
       ri.quantity,
       u.name AS unit_name
@@ -85,5 +86,13 @@ export class RecipeRepository {
 
     const [rows] = await pool.query(sql, [recipeId]);
     return rows;
+  }
+
+  // Obtener una receta por id más detallada
+  static async getRecipeById(pool, id) {
+    const sql = `SELECT title, description, instructions, image_url, likes_count FROM recipes WHERE id = ?`;
+    const [rows] = await pool.query(sql, [id]);
+    if (rows.length === 0) return null;
+    return rows[0];
   }
 }

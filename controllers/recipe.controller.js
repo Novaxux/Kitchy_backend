@@ -97,7 +97,6 @@ export async function updateRecipe(req, res) {
   }
 }
 
-
 /** DELETE /recipes/:id */
 export async function deleteRecipe(req, res) {
   const { id } = req.params;
@@ -119,15 +118,44 @@ export async function getIngredientsByRecipe(req, res) {
   const { id: recipeId } = req.params;
 
   try {
-    const ingredients = await RecipeRepository.getIngredientsByRecipeId(pool, recipeId);
+    const ingredients = await RecipeRepository.getIngredientsByRecipeId(
+      pool,
+      recipeId
+    );
 
     if (ingredients.length === 0) {
-      return res.status(404).json({ error: "No ingredients found for this recipe" });
+      return res
+        .status(404)
+        .json({ error: "No ingredients found for this recipe" });
     }
 
     res.json(ingredients);
   } catch (error) {
     console.error("Error fetching ingredients:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** GET /recipes/:id */
+export async function getRecipeById(req, res) {
+  const { id } = req.params;
+
+  try {
+    const recipe = await RecipeRepository.getRecipeById(pool, id);
+
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    // Also fetch ingredients for the recipe
+    const ingredients = await RecipeRepository.getIngredientsByRecipeId(
+      pool,
+      id
+    );
+
+    res.json({ ...recipe, ingredients });
+  } catch (error) {
+    console.error("Error fetching recipe by id:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
