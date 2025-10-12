@@ -31,10 +31,9 @@ export class RecipeRepository {
     }
   }
   // Obtener todas las recetas
-  static async getAllRecipes(pool) {
-    const [rows] = await pool.query(
-      "SELECT id, title, description, image_url, likes_count FROM recipes"
-    );
+  static async getAllRecipes(pool, offset = 0, limit = 10) {
+    const sql = `SELECT id, title, description, image_url, likes_count FROM recipes ORDER BY id DESC LIMIT ? OFFSET ?`;
+    const [rows] = await pool.query(sql, [Number(limit), Number(offset)]);
     return rows;
   }
 
