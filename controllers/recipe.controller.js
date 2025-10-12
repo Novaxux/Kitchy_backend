@@ -1,0 +1,133 @@
+import { RecipeRepository } from "../models/RecipeRepository.js";
+import pool from "../config/db.js";
+
+/** POST /recipes */
+export async function createRecipe(req, res) {
+  try {
+    const recipeId = await RecipeRepository.createRecipe(pool, req.body);
+    res.status(201).json({ message: "Recipe created", recipeId });
+  } catch (error) {
+    console.error("Error creating recipe:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** POST /recipes/:id/ingredients */
+export async function addIngredients(req, res) {
+  const { id: recipeId } = req.params;
+  const { ingredients } = req.body; // [{ingredient_id, unit_id, quantity}, ...]
+
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    await RecipeRepository.addIngredientsToRecipe(
+      connection,
+      recipeId,
+      ingredients
+    );
+
+    await connection.commit();
+    res.json({ message: "Ingredients added successfully" });
+  } catch (error) {
+    await connection.rollback();
+    console.error("Error adding ingredients:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    connection.release();
+  }
+}
+
+/** GET /recipes */
+export async function getAllRecipes(req, res) {
+  try {
+    const recipes = await RecipeRepository.getAllRecipes(pool);
+    res.json(recipes);
+  } catch (error) {
+    console.error("Error fetching recipes:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** GET /recipes/search?name=... */
+export async function getRecipesByName(req, res) {
+  const { name } = req.query;
+
+  if (!name) {
+    return res
+      .status(400)
+      .json({ error: "Query parameter 'name' is required" });
+  }
+
+  try {
+    const recipes = await RecipeRepository.getRecipesByName(pool, name);
+    res.json(recipes);
+  } catch (error) {
+    console.error("Error searching recipes:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** PATCH /recipes/:id */
+export async function updateRecipe(req, res) {
+  const { id } = req.params;
+  const updates = req.body; // { title, description, instructions, image_url, category_id, country_id }
+
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const result = await RecipeRepository.updateRecipe(connection, id, updates);
+
+    if (result.affectedRows === 0) {
+      await connection.rollback();
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    await connection.commit();
+    res.json({ message: "Recipe updated successfully" });
+  } catch (error) {
+    await connection.rollback();
+    console.error("Error updating recipe:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    connection.release();
+  }
+}
+
+
+/** DELETE /recipes/:id */
+export async function deleteRecipe(req, res) {
+  const { id } = req.params;
+
+  try {
+    const result = await RecipeRepository.deleteRecipe(pool, id);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+    res.json({ message: "Recipe deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting recipe:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** GET /recipes/:id/ingredients */
+export async function getIngredientsByRecipe(req, res) {
+  const { id: recipeId } = req.params;
+
+  try {
+    const ingredients = await RecipeRepository.getIngredientsByRecipeId(pool, recipeId);
+
+    if (ingredients.length === 0) {
+      return res.status(404).json({ error: "No ingredients found for this recipe" });
+    }
+
+    res.json(ingredients);
+  } catch (error) {
+    console.error("Error fetching ingredients:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
