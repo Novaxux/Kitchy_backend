@@ -35,12 +35,12 @@ app.use(
 );
 
 // Routes
-app.use("/recipes", recipesRoutes);
-app.use("/ingredients", ingredientsRoutes);
+app.use("/auth", authRoutes);
+// Mount specific /recipes subroutes before the general recipes router
 app.use("/recipes", likeRoute);
 app.use("/recipes", favoritesRoutes);
-// Auth routes
-app.use("/auth", authRoutes);
+app.use("/recipes", recipesRoutes);
+app.use("/ingredients", ingredientsRoutes);
 
 app.listen(PORT, () => {
   console.log(`server running on http://localhost:${PORT}`);

@@ -5,12 +5,11 @@ import pool from "../config/db.js";
 export async function toggleFavorite(req, res) {
   try {
     const { recipeId } = req.params;
-    const { userId } = req.body;
+    // Prefer session-attached user, fallback to req.user (attachUser middleware)
+    const userId = req.session.user.id;
 
-    if (!userId || !recipeId) {
-      return res
-        .status(400)
-        .json({ message: "userId and recipeId are required" });
+    if (!recipeId) {
+      return res.status(400).json({ message: "recipeId is required" });
     }
 
     // Revisar si ya existe
@@ -43,14 +42,9 @@ export async function toggleFavorite(req, res) {
   }
 }
 export async function getFavorites(req, res) {
-  // const userId = req.user?.id;
-
-  // if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
   try {
-    const { userId } = req.body; // Temporalmente, hasta tener autenticación
+    const userId = req.session.user.id;
     const data = await FavoritesRepository.getFavoriteIds(pool, userId);
-
     return res.json({ favorites: data });
   } catch (error) {
     console.error("Error fetching favorites:", error);

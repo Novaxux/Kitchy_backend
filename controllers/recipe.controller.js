@@ -44,10 +44,7 @@ export async function getAllRecipes(req, res) {
   try {
     // parse optional pagination params
     const offsetParam = req.query.offset;
-    // const limitParam = req.query.limit;
-
     const offset = offsetParam !== undefined ? Number(offsetParam) : 0;
-    // const limit = limitParam !== undefined ? Number(limitParam) : 20;
 
     if (!Number.isInteger(offset) || offset < 0) {
       return res
@@ -56,12 +53,7 @@ export async function getAllRecipes(req, res) {
           error: "Query parameter 'offset' must be a non-negative integer",
         });
     }
-    // if (!Number.isInteger(limit) || limit <= 0) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Query parameter 'limit' must be a positive integer" });
-    // }
-
+ 
     const recipes = await RecipeRepository.getAllRecipes(pool, offset);
     res.json(recipes);
   } catch (error) {

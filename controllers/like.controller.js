@@ -4,8 +4,12 @@ import pool from "../config/db.js";
 
 export async function toggleLike(req, res) {
   const { recipeId } = req.params;
-  //   const userId = req.user.id; // Asumiendo middleware de auth se recibirá por cookie
-  const userId = req.body.userId; // Temporalmente obtenemos userId del body para pruebas
+  // Prefer session or attached user; fallback to body for compatibility
+  const userId = req.session?.user?.id || req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   const connection = await pool.getConnection();
 
