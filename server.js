@@ -9,6 +9,7 @@ import favoritesRoutes from "./routes/favorites.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import session from "express-session";
 import { SESSION_SECRET } from "./config/config.js";
+import { attachUser } from "./middlewares/auth.middleware.js";
 
 const app = express();
 app.use(
@@ -30,9 +31,13 @@ app.use(
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
+
+// Attach user info to req.user when session exists
+app.use(attachUser);
 
 // Routes
 app.use("/auth", authRoutes);

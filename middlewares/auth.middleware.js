@@ -1,5 +1,5 @@
 import { AuthRepository } from "../models/AuthRepository.js";
-import pool from "../config/db.js";
+import { userPool as pool } from "../config/db.js";
 
 export function requireAuth(req, res, next) {
   if (req.session && req.session.user && req.session.user.id) {
