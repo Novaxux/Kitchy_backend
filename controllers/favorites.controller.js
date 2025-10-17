@@ -7,7 +7,7 @@ export async function toggleFavorite(req, res) {
     const { recipeId } = req.params;
     // Prefer session-attached user, fallback to req.user (attachUser middleware)
     const userId = req.session.user.id;
-
+    
     if (!recipeId) {
       return res.status(400).json({ message: "recipeId is required" });
     }
@@ -44,6 +44,7 @@ export async function toggleFavorite(req, res) {
 export async function getFavorites(req, res) {
   try {
     const userId = req.session.user.id;
+
     const data = await FavoritesRepository.getFavoriteIds(pool, userId);
     return res.json({ favorites: data });
   } catch (error) {

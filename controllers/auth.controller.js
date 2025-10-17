@@ -1,5 +1,5 @@
 import { AuthRepository } from "../models/AuthRepository.js";
-import pool from "../config/db.js";
+import { userPool as pool } from "../config/db.js";
 import bcrypt from "bcryptjs";
 
 export async function signup(req, res) {

@@ -1,10 +1,11 @@
 import { IngredientsRepository } from "../models/IngredientsRepository.js";
-import pool from "../config/db.js";
+import { getPoolFor } from "../lib/dbSelector.js";
 
 export class IngredientsController {
   /** GET /ingredients */
   static async getAll(req, res) {
     try {
+      const pool = getPoolFor(req);
       const ingredients = await IngredientsRepository.getAll(pool);
       res.json(ingredients);
     } catch (error) {
@@ -17,6 +18,7 @@ export class IngredientsController {
   static async getById(req, res) {
     const { id } = req.params;
     try {
+      const pool = getPoolFor(req);
       const ingredient = await IngredientsRepository.getById(pool, id);
       if (!ingredient)
         return res.status(404).json({ error: "Ingredient not found" });
@@ -30,7 +32,8 @@ export class IngredientsController {
   /** POST /ingredients */
   static async create(req, res) {
     try {
-      const id = await IngredientsRepository.create(pool, req.body);
+  const pool = getPoolFor(req);
+  const id = await IngredientsRepository.create(pool, req.body);
       res.status(201).json({ message: "Ingredient created", id });
     } catch (error) {
       console.error("Error creating ingredient:", error);
@@ -42,11 +45,8 @@ export class IngredientsController {
   static async update(req, res) {
     const { id } = req.params;
     try {
-      const affectedRows = await IngredientsRepository.update(
-        pool,
-        id,
-        req.body
-      );
+  const pool = getPoolFor(req);
+  const affectedRows = await IngredientsRepository.update(pool, id, req.body);
       if (affectedRows === 0)
         return res.status(404).json({ error: "Ingredient not found" });
       res.json({ message: "Ingredient updated" });
@@ -60,7 +60,8 @@ export class IngredientsController {
   static async delete(req, res) {
     const { id } = req.params;
     try {
-      const affectedRows = await IngredientsRepository.delete(pool, id);
+  const pool = getPoolFor(req);
+  const affectedRows = await IngredientsRepository.delete(pool, id);
       if (affectedRows === 0)
         return res.status(404).json({ error: "Ingredient not found" });
       res.json({ message: "Ingredient deleted" });

@@ -1,5 +1,5 @@
 import { RecipeRepository } from "../models/RecipeRepository.js";
-import pool from "../config/db.js";
+import { userPool as pool } from "../config/db.js";
 
 /** POST /recipes */
 export async function createRecipe(req, res) {

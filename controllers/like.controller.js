@@ -1,6 +1,6 @@
 // controllers/likeController.js
 import { LikeRepository } from "../models/LikeRepository.js";
-import pool from "../config/db.js";
+import { userPool as pool } from "../config/db.js";
 
 export async function toggleLike(req, res) {
   const { recipeId } = req.params;
