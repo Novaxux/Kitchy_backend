@@ -1,16 +1,18 @@
 // controllers/FavoritesController.js
 import { FavoritesRepository } from "../models/FavoritesRepository.js";
-import pool from "../config/db.js";
+import { getPoolFor } from "../lib/dbSelector.js";
 
 export async function toggleFavorite(req, res) {
   try {
     const { recipeId } = req.params;
     // Prefer session-attached user, fallback to req.user (attachUser middleware)
     const userId = req.session.user.id;
-    
+
     if (!recipeId) {
       return res.status(400).json({ message: "recipeId is required" });
     }
+
+    const pool = getPoolFor(req);
 
     // Revisar si ya existe
     const existing = await FavoritesRepository.getFavorite(
@@ -29,7 +31,7 @@ export async function toggleFavorite(req, res) {
       saved = !existing.saved;
       await FavoritesRepository.updateFavorite(pool, userId, recipeId, saved);
     }
-
+-
     res.json({
       message: saved
         ? "Recipe added to favorites"
@@ -41,10 +43,11 @@ export async function toggleFavorite(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
 export async function getFavorites(req, res) {
   try {
     const userId = req.session.user.id;
-
+    const pool = getPoolFor(req);
     const data = await FavoritesRepository.getFavoriteIds(pool, userId);
     return res.json({ favorites: data });
   } catch (error) {

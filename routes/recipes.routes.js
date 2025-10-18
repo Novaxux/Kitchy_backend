@@ -1,13 +1,17 @@
 import { Router } from "express";
 import * as RecipeController from "../controllers/recipe.controller.js";
+import { attachUser, requireAuth } from "../middlewares/auth.middleware.js";
+import { requireAdmin } from "../middlewares/admin.middleware.js";
 
 const router = Router();
 
+router.use(attachUser);
+router.use(requireAuth);
 // Crear una nueva receta
-router.post("/", RecipeController.createRecipe);
+router.post("/", requireAdmin, RecipeController.createRecipe);
 
 // Agregar ingredientes a una receta
-router.post("/:id/ingredients", RecipeController.addIngredients);
+router.post("/:id/ingredients", requireAdmin, RecipeController.addIngredients);
 
 // Obtener todos los ingredientes de una receta
 router.get("/:id/ingredients", RecipeController.getIngredientsByRecipe);
@@ -22,9 +26,9 @@ router.get("/search", RecipeController.getRecipesByName);
 router.get("/:id", RecipeController.getRecipeById);
 
 // Modificar una receta (PATCH)
-router.patch("/:id", RecipeController.updateRecipe);
+router.patch("/:id", requireAdmin, RecipeController.updateRecipe);
 
 // Eliminar una receta
-router.delete("/:id", RecipeController.deleteRecipe);
+router.delete("/:id", requireAdmin, RecipeController.deleteRecipe);
 
 export default router;

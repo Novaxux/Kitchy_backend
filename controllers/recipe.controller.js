@@ -1,8 +1,9 @@
 import { RecipeRepository } from "../models/RecipeRepository.js";
-import { userPool as pool } from "../config/db.js";
+import { getPoolFor } from "../lib/dbSelector.js";
 
 /** POST /recipes */
 export async function createRecipe(req, res) {
+  const pool = await getPoolFor(req);
   try {
     const recipeId = await RecipeRepository.createRecipe(pool, req.body);
     res.status(201).json({ message: "Recipe created", recipeId });
@@ -15,8 +16,8 @@ export async function createRecipe(req, res) {
 /** POST /recipes/:id/ingredients */
 export async function addIngredients(req, res) {
   const { id: recipeId } = req.params;
-  const { ingredients } = req.body; // [{ingredient_id, unit_id, quantity}, ...]
-
+  const { ingredients } = req.body;
+  const pool = await getPoolFor(req);
   const connection = await pool.getConnection();
 
   try {
@@ -41,19 +42,14 @@ export async function addIngredients(req, res) {
 
 /** GET /recipes */
 export async function getAllRecipes(req, res) {
+  const pool = await getPoolFor(req);
   try {
-    // parse optional pagination params
-    const offsetParam = req.query.offset;
-    const offset = offsetParam !== undefined ? Number(offsetParam) : 0;
+    const offset = req.query.offset ? Number(req.query.offset) : 0;
 
     if (!Number.isInteger(offset) || offset < 0) {
-      return res
-        .status(400)
-        .json({
-          error: "Query parameter 'offset' must be a non-negative integer",
-        });
+      return res.status(400).json({ error: "Invalid offset value" });
     }
- 
+
     const recipes = await RecipeRepository.getAllRecipes(pool, offset);
     res.json(recipes);
   } catch (error) {
@@ -64,6 +60,7 @@ export async function getAllRecipes(req, res) {
 
 /** GET /recipes/search?name=... */
 export async function getRecipesByName(req, res) {
+  const pool = await getPoolFor(req);
   const { name } = req.query;
 
   if (!name) {
@@ -84,8 +81,8 @@ export async function getRecipesByName(req, res) {
 /** PATCH /recipes/:id */
 export async function updateRecipe(req, res) {
   const { id } = req.params;
-  const updates = req.body; // { title, description, instructions, image_url, category_id, country_id }
-
+  const updates = req.body;
+  const pool = await getPoolFor(req);
   const connection = await pool.getConnection();
 
   try {
@@ -112,6 +109,7 @@ export async function updateRecipe(req, res) {
 /** DELETE /recipes/:id */
 export async function deleteRecipe(req, res) {
   const { id } = req.params;
+  const pool = await getPoolFor(req);
 
   try {
     const result = await RecipeRepository.deleteRecipe(pool, id);
@@ -128,19 +126,18 @@ export async function deleteRecipe(req, res) {
 /** GET /recipes/:id/ingredients */
 export async function getIngredientsByRecipe(req, res) {
   const { id: recipeId } = req.params;
+  const pool = await getPoolFor(req);
 
   try {
     const ingredients = await RecipeRepository.getIngredientsByRecipeId(
       pool,
       recipeId
     );
-
     if (ingredients.length === 0) {
       return res
         .status(404)
         .json({ error: "No ingredients found for this recipe" });
     }
-
     res.json(ingredients);
   } catch (error) {
     console.error("Error fetching ingredients:", error);
@@ -151,20 +148,18 @@ export async function getIngredientsByRecipe(req, res) {
 /** GET /recipes/:id */
 export async function getRecipeById(req, res) {
   const { id } = req.params;
+  const pool = await getPoolFor(req);
 
   try {
     const recipe = await RecipeRepository.getRecipeById(pool, id);
-
     if (!recipe) {
       return res.status(404).json({ error: "Recipe not found" });
     }
 
-    // Also fetch ingredients for the recipe
     const ingredients = await RecipeRepository.getIngredientsByRecipeId(
       pool,
       id
     );
-
     res.json({ ...recipe, ingredients });
   } catch (error) {
     console.error("Error fetching recipe by id:", error);

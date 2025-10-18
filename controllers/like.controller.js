@@ -1,6 +1,6 @@
 // controllers/likeController.js
 import { LikeRepository } from "../models/LikeRepository.js";
-import { userPool as pool } from "../config/db.js";
+import { getPoolFor } from "../lib/dbSelector.js";
 
 export async function toggleLike(req, res) {
   const { recipeId } = req.params;
@@ -11,6 +11,8 @@ export async function toggleLike(req, res) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  // Usa el pool correspondiente al rol del usuario
+  const pool = await getPoolFor(req);
   const connection = await pool.getConnection();
 
   try {

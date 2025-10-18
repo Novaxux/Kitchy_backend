@@ -99,9 +99,3 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, unit_id, quantity) VAL
 INSERT INTO roles (name) VALUES 
 ('admin'),
 ('user');
-
--- ----------------------------
--- Users
--- ----------------------------
-INSERT INTO users (username, password) VALUES
-('johndoe', '123456');
