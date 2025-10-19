@@ -7,31 +7,18 @@ const router = Router();
 
 router.use(attachUser);
 router.use(requireAuth);
-// Crear una nueva receta
+
+// CRUD de recetas (admin)
 router.post("/", requireAdmin, RecipeController.createRecipe);
-
-// Agregar ingredientes a una receta
 router.post("/:id/ingredients", requireAdmin, RecipeController.addIngredients);
-
-// Obtener todos los ingredientes de una receta
-router.get("/:id/ingredients", RecipeController.getIngredientsByRecipe);
-
-// Obtener todas las recetas
-router.get("/", RecipeController.getAllRecipes);
-
-// Buscar recetas por nombre
-router.get("/search", RecipeController.getRecipesByName);
-
-// Obtener detalles de una receta por id
-router.get("/:id/details", RecipeController.getRecipeDetailsById);
-
-// Obtener descripcion general de una receta por id
-router.get("/:id", RecipeController.getRecipeById);
-
-// Modificar una receta (PATCH)
 router.patch("/:id", requireAdmin, RecipeController.updateRecipe);
-
-// Eliminar una receta
 router.delete("/:id", requireAdmin, RecipeController.deleteRecipe);
+
+// Consultas abiertas
+router.get("/", RecipeController.getAllRecipes);
+router.get("/search", RecipeController.getFilteredRecipes);
+router.get("/:id", RecipeController.getRecipeById);
+router.get("/:id/details", RecipeController.getRecipeDetailsById);
+router.get("/:id/ingredients", RecipeController.getIngredientsByRecipe);
 
 export default router;

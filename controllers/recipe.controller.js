@@ -5,7 +5,7 @@ import { getPoolFor } from "../lib/dbSelector.js";
 export async function createRecipe(req, res) {
   const pool = await getPoolFor(req);
   try {
-    const recipeId = await RecipeRepository.createRecipe(pool, req.body);
+    const recipeId = await RecipeRepository.create(pool, req.body);
     res.status(201).json({ message: "Recipe created", recipeId });
   } catch (error) {
     console.error("Error creating recipe:", error);
@@ -22,13 +22,11 @@ export async function addIngredients(req, res) {
 
   try {
     await connection.beginTransaction();
-
     await RecipeRepository.addIngredientsToRecipe(
       connection,
       recipeId,
       ingredients
     );
-
     await connection.commit();
     res.json({ message: "Ingredients added successfully" });
   } catch (error) {
@@ -45,12 +43,10 @@ export async function getAllRecipes(req, res) {
   const pool = await getPoolFor(req);
   try {
     const offset = req.query.offset ? Number(req.query.offset) : 0;
-
     if (!Number.isInteger(offset) || offset < 0) {
       return res.status(400).json({ error: "Invalid offset value" });
     }
-
-    const recipes = await RecipeRepository.getAllRecipes(pool, offset);
+    const recipes = await RecipeRepository.getAll(pool, offset);
     res.json(recipes);
   } catch (error) {
     console.error("Error fetching recipes:", error);
@@ -58,25 +54,34 @@ export async function getAllRecipes(req, res) {
   }
 }
 
-/** GET /recipes/search?name=... */
-export async function getRecipesByName(req, res) {
+/** GET /recipes/:id */
+export async function getRecipeById(req, res) {
+  const { id } = req.params;
   const pool = await getPoolFor(req);
-  const { name } = req.query;
-
-  if (!name) {
-    return res
-      .status(400)
-      .json({ error: "Query parameter 'name' is required" });
-  }
 
   try {
-    const recipes = await RecipeRepository.getRecipesByName(pool, name);
-    if (recipes.length === 0) {
-      return res.status(404).json({ error: "No recipes found" });
-    }
-    res.json(recipes);
+    const recipe = await RecipeRepository.getById(pool, id);
+    if (!recipe) return res.status(404).json({ error: "Recipe not found" });
+    res.json(recipe);
   } catch (error) {
-    console.error("Error searching recipes:", error);
+    console.error("Error fetching recipe by id:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** GET /recipes/:id/details */
+export async function getRecipeDetailsById(req, res) {
+  const { id } = req.params;
+  const pool = await getPoolFor(req);
+
+  try {
+    const recipe = await RecipeRepository.getById(pool, id);
+    if (!recipe) return res.status(404).json({ error: "Recipe not found" });
+
+    const ingredients = await RecipeRepository.getIngredients(pool, id);
+    res.json({ ...recipe, ingredients });
+  } catch (error) {
+    console.error("Error fetching recipe details:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -90,14 +95,11 @@ export async function updateRecipe(req, res) {
 
   try {
     await connection.beginTransaction();
-
-    const result = await RecipeRepository.updateRecipe(connection, id, updates);
-
+    const result = await RecipeRepository.update(connection, id, updates);
     if (result.affectedRows === 0) {
       await connection.rollback();
       return res.status(404).json({ error: "Recipe not found" });
     }
-
     await connection.commit();
     res.json({ message: "Recipe updated successfully" });
   } catch (error) {
@@ -115,10 +117,9 @@ export async function deleteRecipe(req, res) {
   const pool = await getPoolFor(req);
 
   try {
-    const result = await RecipeRepository.deleteRecipe(pool, id);
-    if (result.affectedRows === 0) {
+    const result = await RecipeRepository.delete(pool, id);
+    if (result.affectedRows === 0)
       return res.status(404).json({ error: "Recipe not found" });
-    }
     res.json({ message: "Recipe deleted successfully" });
   } catch (error) {
     console.error("Error deleting recipe:", error);
@@ -132,15 +133,9 @@ export async function getIngredientsByRecipe(req, res) {
   const pool = await getPoolFor(req);
 
   try {
-    const ingredients = await RecipeRepository.getIngredientsByRecipeId(
-      pool,
-      recipeId
-    );
-    if (ingredients.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No ingredients found for this recipe" });
-    }
+    const ingredients = await RecipeRepository.getIngredients(pool, recipeId);
+    if (!ingredients.length)
+      return res.status(404).json({ error: "No ingredients found" });
     res.json(ingredients);
   } catch (error) {
     console.error("Error fetching ingredients:", error);
@@ -148,42 +143,27 @@ export async function getIngredientsByRecipe(req, res) {
   }
 }
 
-/** GET /recipes/:id */
-export async function getRecipeById(req, res) {
-  const { id } = req.params;
+/** GET /recipes/search?category=...&country=...&name=... */
+export async function getFilteredRecipes(req, res) {
   const pool = await getPoolFor(req);
+  console.log("Filtering recipes with params:", req.query);
+  const { category, country, name } = req.query;
 
   try {
-    const recipe = await RecipeRepository.getRecipeById(pool, id);
-    if (!recipe) {
-      return res.status(404).json({ error: "Recipe not found" });
+    // Si no se envía ningún filtro
+    if (!category && !country && !name) {
+      return res.status(400).json({ error: "Should provide at least one filter (category, name, or country) " });
     }
 
-    res.json(recipe);
-  } catch (error) {
-    console.error("Error fetching recipe by id:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-}
+    const recipes = await RecipeRepository.getFiltered(pool, { category, country, name });
 
-/** GET /recipes/:id/details */
-export async function getRecipeDetailsById(req, res) {
-  const { id } = req.params;
-  const pool = await getPoolFor(req);
-
-  try {
-    const recipe = await RecipeRepository.getRecipeById(pool, id);
-    if (!recipe) {
-      return res.status(404).json({ error: "Recipe not found" });
+    if (!recipes.length) {
+      return res.status(404).json({ error: "No recipes found with provided filters" });
     }
 
-    const ingredients = await RecipeRepository.getIngredientsByRecipeId(
-      pool,
-      id
-    );
-    res.json({ ...recipe, ingredients });
+    res.json(recipes);
   } catch (error) {
-    console.error("Error fetching recipe by id:", error);
+    console.error("Error filtering recipes:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
