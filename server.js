@@ -7,6 +7,8 @@ import ingredientsRoutes from "./routes/ingredients.routes.js";
 import likeRoute from "./routes/like.routes.js";
 import favoritesRoutes from "./routes/favorites.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import categoriesRoutes from "./routes/categories.routes.js";
+import countryRoutes from "./routes/country.routes.js";
 import session from "express-session";
 import { SESSION_SECRET } from "./config/config.js";
 import { attachUser } from "./middlewares/auth.middleware.js";
@@ -46,6 +48,8 @@ app.use("/recipes", likeRoute);
 app.use("/recipes", favoritesRoutes);
 app.use("/recipes", recipesRoutes);
 app.use("/ingredients", ingredientsRoutes);
+app.use("/categories", categoriesRoutes);
+app.use("/countries", countryRoutes);
 
 app.listen(PORT, () => {
   console.log(`server running on http://localhost:${PORT}`);
