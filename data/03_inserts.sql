@@ -9,18 +9,6 @@ INSERT INTO units (name, type) VALUES
 ('tsp', 'volume'),
 ('piece', 'piece'),
 ('slice', 'piece');
--- ----------------------------
--- Categories
--- ----------------------------
-INSERT INTO categories (name) VALUES
-('Desayunos'),
-('Postres'),
-('Almuerzos'),
-('Cenas'),
-('Snacks'),
-('Bebidas'),
-('Sopas'),
-('Ensaladas');
 
 -- ----------------------------
 -- Countries (con SVG simplificado)
@@ -65,18 +53,18 @@ INSERT INTO categories (name) VALUES
 -- ----------------------------
 -- Recipes
 -- ----------------------------
-INSERT INTO recipes (title, description, instructions, image_url, category_id, country_id, likes_count)
+INSERT INTO recipes (title, description, instructions, image_url, category_id, country_id)
 VALUES
-('Tacos al Pastor', 'Deliciosos tacos mexicanos', 'Preparar la carne y servir en tortillas.', '', 2, 1, 0),
-('Pizza Margherita', 'Pizza italiana clásica', 'Preparar masa, agregar tomate y queso, hornear.', '', 9, 2, 0),
-('Croissant', 'Panecillo francés', 'Amasar y hornear la masa con mantequilla.', '', 4, 3, 0),
-('Sushi', 'Arroz con pescado crudo', 'Formar rollos de sushi con arroz y pescado.', '', 3, 4, 0),
-('Curry de Pollo', 'Plato indio picante', 'Cocinar pollo con especias y salsa.', '', 2, 5, 0),
-('Ensalada Caprese', 'Tomate, mozzarella y albahaca', 'Cortar y mezclar ingredientes.', '', 8, 2, 0),
-('Crepas', 'Postre francés relleno', 'Preparar masa y rellenar con chocolate o frutas.', '', 4, 3, 0),
-('Sopa de Tomate', 'Sopa caliente de tomate', 'Cocinar tomates y licuar.', '', 7, 1, 0),
-('Lassi', 'Bebida india de yogur', 'Mezclar yogur con agua y especias.', '', 6, 5, 0),
-('Spaghetti Carbonara', 'Pasta italiana con salsa cremosa', 'Cocinar pasta y mezclar con huevo y queso.', '', 10, 2, 0);
+('Tacos al Pastor', 'Deliciosos tacos mexicanos', 'Preparar la carne y servir en tortillas.', '', 2, 1),
+('Pizza Margherita', 'Pizza italiana clásica', 'Preparar masa, agregar tomate y queso, hornear.', '', 9, 2),
+('Croissant', 'Panecillo francés', 'Amasar y hornear la masa con mantequilla.', '', 4, 3),
+('Sushi', 'Arroz con pescado crudo', 'Formar rollos de sushi con arroz y pescado.', '', 3, 4),
+('Curry de Pollo', 'Plato indio picante', 'Cocinar pollo con especias y salsa.', '', 2, 5),
+('Ensalada Caprese', 'Tomate, mozzarella y albahaca', 'Cortar y mezclar ingredientes.', '', 8, 2),
+('Crepas', 'Postre francés relleno', 'Preparar masa y rellenar con chocolate o frutas.', '', 4, 3),
+('Sopa de Tomate', 'Sopa caliente de tomate', 'Cocinar tomates y licuar.', '', 7, 1),
+('Lassi', 'Bebida india de yogur', 'Mezclar yogur con agua y especias.', '', 6, 5),
+('Spaghetti Carbonara', 'Pasta italiana con salsa cremosa', 'Cocinar pasta y mezclar con huevo y queso.', '', 10, 2);
 
 -- ----------------------------
 -- Recipe_Ingredients
