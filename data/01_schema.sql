@@ -24,7 +24,7 @@ CREATE TABLE categories (
 CREATE TABLE countries (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
-    svg_icon LONGTEXT
+    icon TEXT
 
 );
 

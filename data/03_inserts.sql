@@ -13,12 +13,12 @@ INSERT INTO units (name, type) VALUES
 -- ----------------------------
 -- Countries (con SVG simplificado)
 -- ----------------------------
-INSERT INTO countries (name, svg_icon) VALUES
-('México', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="213" height="480" fill="#006847"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#ce1126"/></svg>'),
-('Italia', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="213" height="480" fill="#009246"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#ce2b37"/></svg>'),
-('Francia', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="213" height="480" fill="#0055A4"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#EF4135"/></svg>'),
-('Japón', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="640" height="480" fill="#fff"/><circle cx="320" cy="240" r="96" fill="#bc002d"/></svg>'),
-('India', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="640" height="160" fill="#ff9933"/><rect y="160" width="640" height="160" fill="#fff"/><rect y="320" width="640" height="160" fill="#138808"/><circle cx="320" cy="240" r="40" fill="#000088"/></svg>');
+INSERT INTO countries (name, icon) VALUES
+('México', '🇲🇽'),
+('Italia', '🇮🇹'),
+('Francia', '🇫🇷'),
+('Japón', '🇯🇵'),
+('India', '🇮🇳');
 
 -- ----------------------------
 -- Ingredients
