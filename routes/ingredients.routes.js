@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.use(attachUser);
 router.use(requireAuth);
-router.get("/", IngredientsController.getAll);
 router.get("/:id", IngredientsController.getById);
 router.use(requireAdmin);
+router.get("/", IngredientsController.getAll);
 router.post("/", IngredientsController.create);
 router.put("/:id", IngredientsController.update);
 router.delete("/:id", IngredientsController.delete);
