@@ -11,10 +11,10 @@ router.use(requireAuth);
 
 // Rutas abiertas para cualquier usuario autenticado
 router.get("/:id", CategoriesController.getById);
+router.get("/", CategoriesController.getAll);
 
 // Rutas restringidas a admins
 router.use(requireAdmin);
-router.get("/", CategoriesController.getAll);
 router.post("/", CategoriesController.create);
 router.put("/:id", CategoriesController.update);
 router.delete("/:id", CategoriesController.delete);
