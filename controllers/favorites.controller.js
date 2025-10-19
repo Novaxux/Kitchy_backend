@@ -12,7 +12,7 @@ export async function toggleFavorite(req, res) {
       return res.status(400).json({ message: "recipeId is required" });
     }
 
-    const pool = getPoolFor(req);
+    const pool = await getPoolFor(req);
 
     // Revisar si ya existe
     const existing = await FavoritesRepository.getFavorite(
@@ -47,7 +47,7 @@ export async function toggleFavorite(req, res) {
 export async function getFavorites(req, res) {
   try {
     const userId = req.session.user.id;
-    const pool = getPoolFor(req);
+    const pool = await getPoolFor(req);
     const data = await FavoritesRepository.getFavoriteIds(pool, userId);
     return res.json({ favorites: data });
   } catch (error) {

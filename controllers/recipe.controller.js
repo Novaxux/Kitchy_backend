@@ -71,6 +71,9 @@ export async function getRecipesByName(req, res) {
 
   try {
     const recipes = await RecipeRepository.getRecipesByName(pool, name);
+    if (recipes.length === 0) {
+      return res.status(404).json({ error: "No recipes found" });
+    }
     res.json(recipes);
   } catch (error) {
     console.error("Error searching recipes:", error);
@@ -147,6 +150,24 @@ export async function getIngredientsByRecipe(req, res) {
 
 /** GET /recipes/:id */
 export async function getRecipeById(req, res) {
+  const { id } = req.params;
+  const pool = await getPoolFor(req);
+
+  try {
+    const recipe = await RecipeRepository.getRecipeById(pool, id);
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    res.json(recipe);
+  } catch (error) {
+    console.error("Error fetching recipe by id:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+/** GET /recipes/:id/details */
+export async function getRecipeDetailsById(req, res) {
   const { id } = req.params;
   const pool = await getPoolFor(req);
 

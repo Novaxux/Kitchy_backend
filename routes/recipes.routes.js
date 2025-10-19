@@ -22,7 +22,10 @@ router.get("/", RecipeController.getAllRecipes);
 // Buscar recetas por nombre
 router.get("/search", RecipeController.getRecipesByName);
 
-// Obtener una receta por id
+// Obtener detalles de una receta por id
+router.get("/:id/details", RecipeController.getRecipeDetailsById);
+
+// Obtener descripcion general de una receta por id
 router.get("/:id", RecipeController.getRecipeById);
 
 // Modificar una receta (PATCH)
