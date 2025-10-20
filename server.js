@@ -6,13 +6,8 @@ import session from "express-session";
 import { PORT, CORS_ORIGIN, SESSION_SECRET } from "./config/config.js";
 
 // Rutas
-import authRoutes from "./routes/auth.routes.js";
-import recipesRoutes from "./routes/recipes.routes.js";
-import ingredientsRoutes from "./routes/ingredients.routes.js";
-import categoriesRoutes from "./routes/categories.routes.js";
-import countryRoutes from "./routes/country.routes.js";
-import favoritesRoutes from "./routes/favorites.routes.js";
-import likeRoutes from "./routes/like.routes.js";
+import webRoutes from "./routes/web.routes.js";
+import apiRoutes from "./routes/api.routes.js";
 
 // Middlewares
 import { attachUser } from "./middlewares/auth.middleware.js";
@@ -20,12 +15,12 @@ import { attachUser } from "./middlewares/auth.middleware.js";
 const app = express();
 
 // --- Middlewares base ---
-app.use(
-  cors({
-    origin: CORS_ORIGIN,
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: CORS_ORIGIN,
+//     credentials: true,
+//   })
+// );
 app.use(morgan("dev"));
 app.use(express.json());
 
@@ -48,13 +43,8 @@ app.use(
 app.use(attachUser);
 
 // --- Rutas ---
-app.use("/auth", authRoutes);
-app.use("/recipes", likeRoutes);
-app.use("/recipes", favoritesRoutes);
-app.use("/recipes", recipesRoutes);
-app.use("/ingredients", ingredientsRoutes);
-app.use("/categories", categoriesRoutes);
-app.use("/countries", countryRoutes);
+app.use("/api", apiRoutes);
+app.use("/", webRoutes); 
 
 // --- Servidor ---
 app.listen(PORT, () => {
