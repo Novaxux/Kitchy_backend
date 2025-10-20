@@ -41,12 +41,13 @@ export async function addIngredients(req, res) {
 /** GET /recipes */
 export async function getAllRecipes(req, res) {
   const pool = await getPoolFor(req);
+  const userId = req.session.user.id;
   try {
     const offset = req.query.offset ? Number(req.query.offset) : 0;
     if (!Number.isInteger(offset) || offset < 0) {
       return res.status(400).json({ error: "Invalid offset value" });
     }
-    const recipes = await RecipeRepository.getAll(pool, offset);
+    const recipes = await RecipeRepository.getAll(pool, userId, offset);
     res.json(recipes);
   } catch (error) {
     console.error("Error fetching recipes:", error);
@@ -57,10 +58,11 @@ export async function getAllRecipes(req, res) {
 /** GET /recipes/:id */
 export async function getRecipeById(req, res) {
   const { id } = req.params;
+  const userId = req.session.user.id;
   const pool = await getPoolFor(req);
 
   try {
-    const recipe = await RecipeRepository.getById(pool, id);
+    const recipe = await RecipeRepository.getById(pool, id, userId);
     if (!recipe) return res.status(404).json({ error: "Recipe not found" });
     res.json(recipe);
   } catch (error) {
@@ -148,17 +150,28 @@ export async function getFilteredRecipes(req, res) {
   const pool = await getPoolFor(req);
   console.log("Filtering recipes with params:", req.query);
   const { category, country, name } = req.query;
-
+  const userId = req.session.user.id;
   try {
     // Si no se envía ningún filtro
     if (!category && !country && !name) {
-      return res.status(400).json({ error: "Should provide at least one filter (category, name, or country) " });
+      return res
+        .status(400)
+        .json({
+          error:
+            "Should provide at least one filter (category, name, or country) ",
+        });
     }
 
-    const recipes = await RecipeRepository.getFiltered(pool, { category, country, name });
+    const recipes = await RecipeRepository.getFiltered(pool, userId, {
+      category,
+      country,
+      name,
+    });
 
     if (!recipes.length) {
-      return res.status(404).json({ error: "No recipes found with provided filters" });
+      return res
+        .status(404)
+        .json({ error: "No recipes found with provided filters" });
     }
 
     res.json(recipes);
