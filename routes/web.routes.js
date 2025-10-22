@@ -22,5 +22,10 @@ router.get("/recipes", (req, res) => {
 router.get("/favorites", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
-
+router.get("/login", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+router.get("/signup", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 export default router;
