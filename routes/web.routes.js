@@ -16,11 +16,10 @@ router.use(static_(frontendPath));
 router.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
-
-router.get("/recipes",attachUser, requireAuth, (req, res) => {
+router.get("/recipes", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
-router.get("/favorites", attachUser, requireAuth, (req, res) => {
+router.get("/favorites", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
